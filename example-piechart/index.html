@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateJS - Pie Chart Diagram</title>
+    <style>
+        #my-canvas {
+            border: #cacaca 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="my-canvas" width="400" height="300">
+        Your web browser does not support canvas element.
+    </canvas>
+    <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+    <script>
+        window.onload = init;
+        let stage;
+
+        function init() {
+            stage = new createjs.Stage("my-canvas");
+            stage.enableMouseOver(10);
+
+            makePieChart(stage, [10, 10, 10, 10, 20, 40]);
+
+            stage.update();
+        }
+
+        let fillCommand;
+
+        function makePieChart(stage, shares) {
+            let sum = shares.reduce((a, b) => a + b, 0);
+
+            if (sum !== 100)
+                throw new Error("Sum of all shares must be 100.");
+
+            let startAngle = 0;
+
+            for (let i = 0; i < shares.length; i++) {
+
+                let endAngle = startAngle + (Math.PI / 180) * shares[i] * 3.6;
+
+                let segment = new createjs.Shape();
+
+                let red = Math.floor(Math.random() * 200) + 50;
+                let green = Math.floor(Math.random() * 200) + 50;
+                let blue = Math.floor(Math.random() * 200) + 50;
+
+                segment.fillCommand = segment.graphics.beginFill('rgba(' + red + ', ' + green + ', ' + blue + ', 0.7 )').command;
+
+                segment.graphics.beginStroke('white').setStrokeStyle(5);
+
+                segment.graphics.arc(200, 150, 120, startAngle, endAngle).lineTo(200, 150).closePath();
+
+                stage.addChild(segment);
+
+                startAngle = endAngle;
+
+                segment.addEventListener("mouseover", onMouseOver);
+                segment.addEventListener("mouseout", onMouseOut);
+
+
+            }
+        }
+
+        function onMouseOver(event) {
+            event.target.fillCommand.style = event.target.fillCommand.style.replace('0.7', '1.0');
+            stage.update();
+        }
+
+        function onMouseOut(event) {
+            event.target.fillCommand.style = event.target.fillCommand.style.replace('1.0', '0.7');
+            stage.update();
+        }
+    </script>
+</body>
+
+</html>
